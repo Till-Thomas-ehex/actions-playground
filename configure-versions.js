@@ -1,5 +1,6 @@
 const semver = require("semver");
 const fs = require("fs");
+const toml = require("toml");
 
 const version = process.argv[2];
 
@@ -16,7 +17,7 @@ console.log(semver.parse(version));
 console.log(createManifestVersions(semver.parse(version)), "string");
 
 const mockJson = fs.readFileSync("./tauri.conf.json").toJSON();
-const mockToml = totalmem.parse(fs.readFileSync("./cargo.toml").toString());
+const mockToml = toml.parse(fs.readFileSync("./cargo.toml").toString());
 
 console.log(mockJson);
 console.log(mockToml);
