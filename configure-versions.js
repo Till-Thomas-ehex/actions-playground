@@ -28,6 +28,20 @@ mockToml.package.version = rustManifest;
 console.log(mockJson);
 console.log(mockToml);
 
+try {
+  fs.writeFileSync("./tauri.conf.json", mockJson);
+  // file written successfully
+} catch (err) {
+  console.error(err);
+}
+
+try {
+  fs.writeFileSync("./cargo.toml", mockToml);
+  // file written successfully
+} catch (err) {
+  console.error(err);
+}
+
 function createManifestVersions(version) {
   const isTag = version.toString().split("-").length - 1 < 2;
 
