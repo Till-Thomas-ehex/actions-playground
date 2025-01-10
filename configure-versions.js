@@ -1,5 +1,6 @@
 const semver = require("semver");
 const fs = require("fs");
+const path = require("path");
 
 const version = process.argv[2];
 
@@ -8,38 +9,53 @@ if (!version) {
   process.exit(1);
 }
 
-console.log(`The provided version version is: ${version}`);
-
-// Your script logic here
-
-console.log(semver.parse(version));
-// console.log(createManifestVersions(semver.parse(version)), "string");
 const { rustManifest, tauriManifest } = createManifestVersions(
   semver.parse(version)
 );
 
-const mockJson = JSON.parse(fs.readFileSync("./tauri.conf.json"));
-const mockToml = fs.readFileSync("./cargo.toml", "utf-8");
+// update lib
+const updatedToml = ensureCargoTomlVersion(
+  "./src-tauri/cargo.toml",
+  rustManifest
+);
 
-mockJson.package.version = tauriManifest;
+// update tauri.base.conf
+const updatedJson = ensureTauriConfVersion(
+  "./src-tauri/betreiber/tauri.base.conf.json",
+  tauriManifest
+);
+console.log("updatedJson", updatedJson);
 
-const updatedToml = updatedTomlVersion(mockToml, rustManifest);
+// update betreiber
+const betreiberDirs = getBetreiberDirNames();
 
-console.log(mockJson);
-console.log(updatedToml);
+betreiberDirs.forEach((betreiberDir) => {
+  betreiberDir.path;
+  const updatedToml = ensureCargoTomlVersion(
+    `${betreiberDir.path}/cargo.toml`,
+    rustManifest
+  );
+  const updatedJson = ensureTauriConfVersion(
+    `${betreiberDir.path}/tauri.conf.json`,
+    tauriManifest
+  );
 
-try {
-  fs.writeFileSync("./tauri.conf.json", JSON.stringify(mockJson));
-  // file written successfully
-} catch (err) {
-  console.error(err);
+  console.log("updated: ", betreiberDir.name);
+});
+
+function ensureTauriConfVersion(filePath, version) {
+  const tauriConf = JSON.parse(fs.readFileSync(filePath));
+  tauriConf.package.version = version;
+  fs.writeFileSync(filePath, JSON.stringify(tauriConf, null, 4));
+  return tauriConf;
 }
 
-try {
-  fs.writeFileSync("./cargo.toml", updatedToml);
-  // file written successfully
-} catch (err) {
-  console.error(err);
+function ensureCargoTomlVersion(filePath, version) {
+  const cargoToml = fs.readFileSync(filePath, "utf-8");
+  const updatedToml = updatedTomlVersion(cargoToml, version);
+  fs.writeFileSync(filePath, updatedToml);
+
+  return updatedToml;
 }
 
 function createManifestVersions(version) {
@@ -74,4 +90,23 @@ function updatedTomlVersion(toml, version) {
   return toml.replace(packageTableRegex, (match) =>
     match.replace(/version\s*=\s*['"].*?['"]/, versionLine)
   );
+}
+
+function getBetreiberDirNames() {
+  const dirPath = path.resolve("src-tauri/betreiber"); // Cross-platform path resolution
+  const folderPaths = [];
+
+  // Read the directory contents
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const fullPath = path.join(dirPath, entry.name);
+      folderPaths.push({
+        name: entry.name,
+        path: fullPath,
+      });
+    }
+  }
+
+  return folderPaths;
 }

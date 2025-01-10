@@ -1,0 +1,11 @@
+[package]
+# some comment
+name = "playground"
+version = "1.2.3-alpha.323"
+description = "test toml"
+authors = [
+    "",
+] # shows as maintainers in installation
+license = ""
+repository = ""
+edition = "2021"
