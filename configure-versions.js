@@ -29,14 +29,14 @@ console.log(mockJson);
 console.log(mockToml);
 
 try {
-  fs.writeFileSync("./tauri.conf.json", mockJson);
+  fs.writeFileSync("./tauri.conf.json", JSON.stringify(mockJson));
   // file written successfully
 } catch (err) {
   console.error(err);
 }
 
 try {
-  fs.writeFileSync("./cargo.toml", mockToml);
+  fs.writeFileSync("./cargo.toml", toml.stringify(mockToml));
   // file written successfully
 } catch (err) {
   console.error(err);
