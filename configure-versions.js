@@ -1,11 +1,15 @@
-const spawn = require("cross-spawn");
 const semver = require("semver");
 
-const result = spawn.sync("git describe --exact-match --tags");
-console.error(result.stderr?.toString("utf8"));
+const version = process.argv[2];
 
-const version = result.stdout?.toString("utf8");
-console.log(version);
+if (!version) {
+  console.error("No version version provided!");
+  process.exit(1);
+}
+
+console.log(`The provided version version is: ${version}`);
+
+// Your script logic here
 
 console.log(semver.parse(version));
 console.log(createManifestVersions(semver.parse(version)), "string");

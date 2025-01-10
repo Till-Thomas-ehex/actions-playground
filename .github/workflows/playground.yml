@@ -6,9 +6,9 @@ name: PLAYGROUND
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -43,8 +43,17 @@ jobs:
         with:
           node-version: "14"
 
+      - name: Get latest semver tag
+        id: get_tag
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+
+      - name: Display latest semver tag
+        run: echo "The latest semver tag is ${{ env.latest_tag }}"
+
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
-        run: npm run build
+      - name: Run Node.js script with semver
+        run: node configure-versions.js ${{ env.latest_tag }}
