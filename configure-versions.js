@@ -2,9 +2,10 @@ const spawn = require("cross-spawn");
 const semver = require("semver");
 
 const result = spawn.sync("git describe --exact-match --tags");
-const version = result.stdout.toString("utf8");
+console.error(result.stderr?.toString("utf8"));
+
+const version = result.stdout?.toString("utf8");
 console.log(version);
-console.error(result.stderr.toString("utf8"));
 
 console.log(semver.parse(version));
 console.log(createManifestVersions(semver.parse(version)), "string");
