@@ -14,10 +14,16 @@ console.log(`The provided version version is: ${version}`);
 // Your script logic here
 
 console.log(semver.parse(version));
-console.log(createManifestVersions(semver.parse(version)), "string");
+// console.log(createManifestVersions(semver.parse(version)), "string");
+const { rustManifest, tauriManifest } = createManifestVersions(
+  semver.parse(version)
+);
 
-const mockJson = fs.readFileSync("./tauri.conf.json").toJSON();
+const mockJson = JSON.parse(fs.readFileSync("./tauri.conf.json"));
 const mockToml = toml.parse(fs.readFileSync("./cargo.toml").toString());
+
+mockJson.package.version = tauriManifest;
+mockToml.package.version = rustManifest;
 
 console.log(mockJson);
 console.log(mockToml);
