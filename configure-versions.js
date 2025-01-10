@@ -1,4 +1,5 @@
 const semver = require("semver");
+const fs = require("fs");
 
 const version = process.argv[2];
 
@@ -13,6 +14,12 @@ console.log(`The provided version version is: ${version}`);
 
 console.log(semver.parse(version));
 console.log(createManifestVersions(semver.parse(version)), "string");
+
+const mockJson = fs.readFileSync("./tauri.conf.json").toJSON();
+const mockToml = totalmem.parse(fs.readFileSync("./cargo.toml").toString());
+
+console.log(mockJson);
+console.log(mockToml);
 
 function createManifestVersions(version) {
   const isTag = version.toString().split("-").length - 1 < 2;
