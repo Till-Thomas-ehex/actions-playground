@@ -1,6 +1,5 @@
 const semver = require("semver");
 const fs = require("fs");
-const toml = require("toml");
 
 const version = process.argv[2];
 
@@ -20,13 +19,14 @@ const { rustManifest, tauriManifest } = createManifestVersions(
 );
 
 const mockJson = JSON.parse(fs.readFileSync("./tauri.conf.json"));
-const mockToml = toml.parse(fs.readFileSync("./cargo.toml").toString());
+const mockToml = fs.readFileSync("./cargo.toml", "utf-8");
 
 mockJson.package.version = tauriManifest;
-mockToml.package.version = rustManifest;
+
+const updatedToml = updatedTomlVersion(mockToml, rustManifest);
 
 console.log(mockJson);
-console.log(mockToml);
+console.log(updatedToml);
 
 try {
   fs.writeFileSync("./tauri.conf.json", JSON.stringify(mockJson));
@@ -36,7 +36,7 @@ try {
 }
 
 try {
-  fs.writeFileSync("./cargo.toml", toml.stringify(mockToml));
+  fs.writeFileSync("./cargo.toml", updatedToml);
   // file written successfully
 } catch (err) {
   console.error(err);
@@ -64,4 +64,14 @@ function createManifestVersions(version) {
       tauriManifest: `${version.major}.${nextMinor}.0`, // for cross-platform compatibility, no suffix
     };
   }
+}
+
+function updatedTomlVersion(toml, version) {
+  // Regex to find and replace the version in the [package] table
+  const packageTableRegex = /\[package\][\s\S]*?version\s*=\s*['"].*?['"]/;
+  const versionLine = `version = "${version}"`;
+
+  return toml.replace(packageTableRegex, (match) =>
+    match.replace(/version\s*=\s*['"].*?['"]/, versionLine)
+  );
 }

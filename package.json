@@ -10,8 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "cross-spawn": "^7.0.6",
-    "semver": "^7.6.3",
-    "toml": "^3.0.0"
+    "semver": "^7.6.3"
   }
 }
