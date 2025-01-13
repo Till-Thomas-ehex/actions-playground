@@ -35,9 +35,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: check github ref_type and ref_name
         run: |
           echo ${{ github.ref_type }}
