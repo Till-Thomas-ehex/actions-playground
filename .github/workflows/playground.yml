@@ -7,6 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: ["main"]
+    tags:
+      - "*"
   pull_request:
     branches: ["main"]
 
@@ -42,20 +44,10 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0 # Fetch all history for all tags
-
-      - name: Get latest semver tag
-        id: get_tag
-        run: |
-          latest_tag=$(git describe --tags)
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
-
-      - name: Display closest semver tag to HEAD
-        run: echo "The closest semver tag is ${{ env.latest_tag }}"
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Node.js script with semver
-        run: node configure-versions.js ${{ env.latest_tag }}
+      - name: configure Semver in cargo.toml and tauri.conf.json files
+        if: github.ref_type == 'tag'
+        run: node configure-versions.js ${{ github.ref_name }}

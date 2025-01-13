@@ -18,6 +18,7 @@ const updatedToml = ensureCargoTomlVersion(
   "./src-tauri/cargo.toml",
   rustManifest
 );
+console.log("updatedToml", updatedToml);
 
 // update tauri.base.conf
 const updatedJson = ensureTauriConfVersion(
