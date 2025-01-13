@@ -34,11 +34,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: check github ref_type and ref_name
-        run: |
-          echo ${{ github.ref_type }}
-          echo ${{ github.ref_name }}
-
       - name: configure Semver in cargo.toml and tauri.conf.json files with ref_type - ${{ github.ref_type }} and ref_name - ${{github.ref_name}}
         if: github.ref_type == 'tag'
         run: node configure-versions.js ${{ github.ref_name }}

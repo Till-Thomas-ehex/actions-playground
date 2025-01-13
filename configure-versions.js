@@ -18,14 +18,14 @@ const updatedToml = ensureCargoTomlVersion(
   "./src-tauri/cargo.toml",
   rustManifest
 );
-console.log("updatedToml", updatedToml);
+console.log("updatedToml -> ", updatedToml);
 
 // update tauri.base.conf
 const updatedJson = ensureTauriConfVersion(
   "./src-tauri/betreiber/tauri.base.conf.json",
   tauriManifest
 );
-console.log("updatedJson", updatedJson);
+console.log("updatedJson -> ", updatedJson);
 
 // update betreiber
 const betreiberDirs = getBetreiberDirNames();
