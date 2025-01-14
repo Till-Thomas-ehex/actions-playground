@@ -25,6 +25,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -34,6 +36,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: configure Semver in cargo.toml and tauri.conf.json files with ref_type - ${{ github.ref_type }} and ref_name - ${{github.ref_name}}
+      - name: IF TAG -> configure Semver in cargo.toml and tauri.conf.json files with ref_type - ${{ github.ref_type }} and ref_name - ${{github.ref_name}}
         if: github.ref_type == 'tag'
         run: node configure-versions.js ${{ github.ref_name }}
+
+      - name: IF BRANCH -> configure Semver in cargo.toml and tauri.conf.json files
+        if: github.ref_type == 'branch'
+        run: |
+          echo "TAG=$(git describe --tags --always)" >> $GITHUB_ENV
+          node configure-versions.js $TAG
