@@ -13,7 +13,7 @@ const { rustManifest, tauriManifest } = createManifestVersions(version);
 
 // update lib
 const updatedToml = ensureCargoTomlVersion(
-  "./src-tauri/cargo.toml",
+  "./src-tauri/Cargo.toml",
   rustManifest
 );
 console.log("updatedToml -> ", updatedToml);
@@ -31,7 +31,7 @@ const betreiberDirs = getBetreiberDirNames();
 betreiberDirs.forEach((betreiberDir) => {
   betreiberDir.path;
   const updatedToml = ensureCargoTomlVersion(
-    `${betreiberDir.path}/cargo.toml`,
+    `${betreiberDir.path}/Cargo.toml`,
     rustManifest
   );
   const updatedJson = ensureTauriConfVersion(
