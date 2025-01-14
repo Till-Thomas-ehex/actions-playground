@@ -43,5 +43,10 @@ jobs:
       - name: IF BRANCH -> configure Semver in cargo.toml and tauri.conf.json files
         if: github.ref_type == 'branch'
         run: |
-          echo "TAG=$(git describe --tags --always)" >> $GITHUB_ENV
-          node configure-versions.js $TAG
+          # Get the tag description
+          TAG_DESCRIPTION=$(git describe --tags --always)
+
+          # Output the tag description for logging
+          echo "Tag description is $TAG_DESCRIPTION"
+
+          node configure-versions.js "$TAG_DESCRIPTION"
