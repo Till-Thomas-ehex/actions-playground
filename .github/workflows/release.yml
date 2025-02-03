@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           echo ${{ env.BETREIBER }}
-          ls
+          ls -la
           cd src-tauri/betreiber/${{ env.BETREIBER }}
           cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
           cd ../../ # zurück zu src-tauri
