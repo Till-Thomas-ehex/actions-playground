@@ -33,11 +33,11 @@ jobs:
         run: |
           echo ${{ env.BETREIBER }}
           cd src-tauri/betreiber/${{ env.BETREIBER }}
-          # cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
-          # cd ../../ # zurück zu src-tauri
-          # mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
-          # tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
-          # rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+          cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
+          cd ../../ # zurück zu src-tauri
+          mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
+          tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+          rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
   # upload-assets:
   #   needs:
   #     - "create-assets"
