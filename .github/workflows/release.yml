@@ -1,0 +1,81 @@
+name: infinity key release
+# never use `Build Infinity-key Release Artifacts` again as name because of build hickups
+
+on: workflow_dispatch
+env:
+  CARGO_TERM_QUIET: true
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  create-assets:
+    name: Create ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Only include Linux targets, adding an AppImage build
+        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
+    steps:
+      - name: install dependencies (ubuntu only)
+        if: matrix.config.os == 'ubuntu-22.04' && steps.cache-ubuntu-deps.outputs.cache-hit != 'true'
+        run: |
+          ls -al
+          sudo apt-get update
+          sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
+          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
+          sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - name: build infinity-key-${{ env.BETREIBER }}
+        env:
+          BETREIBER: staging
+          BETREIBER_ARTIFACT: infinity-key
+        shell: bash
+        run: |
+          echo ${{ env.BETREIBER }}
+          # cd src-tauri/betreiber/${{ env.BETREIBER }}
+          # cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
+          # cd ../../ # zurück zu src-tauri
+          # mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
+          # tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+          # rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+  # upload-assets:
+  #   needs:
+  #     - "create-assets"
+  #   runs-on: ubuntu-22.04
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
+  #       betreiber: ${{ fromJson('[{"name":"blanko","artifact":"infinity-key"}] ') }}
+  #   steps:
+  #     - name: Download all stored artefacts
+  #       uses: actions/download-artifact@v4
+  #     - name: Nexus Repo Publish Desktop
+  #       uses: sonatype-nexus-community/nexus-repo-github-action@master
+  #       if: startsWith(github.ref, 'refs/tags/')
+  #       with:
+  #         serverUrl: https://artifacts.ehex.de/
+  #         username: ${{ secrets.ARTIFACTS_EHEX_DE_USERNAME }}
+  #         password: ${{ secrets.ARTIFACTS_EHEX_DE_PASSWORD }}
+  #         format: maven2
+  #         repository: hsk-artifacts
+  #         coordinates: groupId=de.ehex.hsk.hsk-admin.key.infinity-key-bundle artifactId=infinity-key-${{ matrix.betreiber.name }}-${{ matrix.config.name }} version=${{ github.ref_name }}
+  #         assets: extension=tar.gz
+  #         filename: "infinity-key-${{ matrix.config.name }}/${{ matrix.betreiber.name }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz"
+  #     - name: Download Web Release Asset
+  #       uses: actions/download-artifact@v4
+  #       if: ${{ false && matrix.betreiber.name == 'blanko' && matrix.config.package == 'nsis' && startsWith(github.ref, 'refs/tags/') }}
+  #       with:
+  #         name: infinity-key-web-windows
+  #     - name: Nexus Repo Publish Web
+  #       uses: sonatype-nexus-community/nexus-repo-github-action@master
+  #       if: ${{ false && matrix.betreiber.name == 'blanko' && matrix.config.package == 'nsis' && startsWith(github.ref, 'refs/tags/') }}
+  #       with:
+  #         serverUrl: https://artifacts.ehex.de/
+  #         username: ${{ secrets.ARTIFACTS_EHEX_DE_USERNAME }}
+  #         password: ${{ secrets.ARTIFACTS_EHEX_DE_PASSWORD }}
+  #         format: maven2
+  #         repository: hsk-artifacts
+  #         coordinates: groupId=de.ehex.hsk.hsk-admin.key.infinity-key-web-static-dist artifactId=infinity-key-${{ matrix.betreiber.name }}-${{ matrix.config.name }} version=${{ github.ref_name }}
+  #         assets: extension=zip
+  #         filename: web.zip
