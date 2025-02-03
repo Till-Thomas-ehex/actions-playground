@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         # Only include Linux targets, adding an AppImage build
-        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
+        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"app","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
     steps:
       - name: install dependencies (ubuntu only)
         if: matrix.config.os == 'ubuntu-22.04' && steps.cache-ubuntu-deps.outputs.cache-hit != 'true'
@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           echo ${{ env.BETREIBER }}
-          # cd src-tauri/betreiber/${{ env.BETREIBER }}
+          cd src-tauri/betreiber/${{ env.BETREIBER }}
           # cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
           # cd ../../ # zurück zu src-tauri
           # mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .

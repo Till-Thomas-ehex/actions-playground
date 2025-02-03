@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node configure-versions.js"
+    "versions": "node configure-versions.js 1.1.1",
+    "build": "echo build!"
   },
   "author": "",
   "license": "ISC",
