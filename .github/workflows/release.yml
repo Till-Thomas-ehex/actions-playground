@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         # Only include Linux targets, adding an AppImage build
-        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"app","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
+        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
     steps:
       - uses: actions/checkout@master
         with:
