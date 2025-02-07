@@ -28,43 +28,17 @@ jobs:
           sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
           sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
           sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-      - name: Download Maven Artifact
-        id: download-maven-artifact
-        uses: clausnz/github-action-download-maven-artifact@0.0.4
-        with:
-          url: "https://repo1.maven.org"
-          repository: "maven2"
-          groupId: "javax.mail"
-          artifactId: "mail"
-          version: "1.5.0-b01"
-          extension: "jar"
-      - name: Cache Cargo target
-        uses: actions/cache@v4
-        with:
-          path: |
-            src-tauri/target
-          key: t-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            t-${{ runner.os }}-cargo-
-      - name: Cache Dependencies (ubuntu only)
-        if: matrix.config.os == 'ubuntu-22.04'
-        id: cache-ubuntu-deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            /usr/lib/x86_64-linux-gnu
-            /usr/include/x86_64-linux-gnu
-            /usr/bin/g++-mingw-w64-x86-64
-            /usr/bin/nsis
-            /usr/bin/cmake
-            /usr/bin/clang
-            /usr/lib/libsoup2.4.so
-            /usr/lib/lsb
-            /usr/lib/libwebkit2gtk-4.0.so
-            /usr/lib/libgtk-3.so
-            /usr/lib/libayatana-appindicator3.so
-            /usr/lib/librsvg2.so
-          key: ${{ runner.os }}-deps
+      - name: install openssl
+        run: |
+          if brew list openssl &>/dev/null; then
+            echo "Using existing OpenSSL installation."
+          else
+            echo "OpenSSL not found. Installing..."
+            brew install openssl
+          fi
+          echo "OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
+          echo "OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib" >> $GITHUB_ENV
+          echo "OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include" >> $GITHUB_ENV
       # - name: Install Tauri CLI
       #   run: |
       #     cd src-tauri/
