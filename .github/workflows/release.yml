@@ -38,25 +38,52 @@ jobs:
           artifactId: "mail"
           version: "1.5.0-b01"
           extension: "jar"
-      - name: Install Tauri CLI
-        run: |
-          cd src-tauri/
-          cargo install tauri-cli --version 1.6.2
-          cargo tauri -V
-      - name: build infinity-key-${{ env.BETREIBER }}
-        env:
-          BETREIBER: staging
-          BETREIBER_ARTIFACT: infinity-key
-        shell: bash
-        run: |
-          echo ${{ env.BETREIBER }}
-          ls -la
-          cd src-tauri/betreiber/${{ env.BETREIBER }}
-          cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
-          cd ../../ # zurück zu src-tauri
-          mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
-          tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
-          rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+      - name: Cache Cargo target
+        uses: actions/cache@v4
+        with:
+          path: |
+            src-tauri/target
+          key: t-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            t-${{ runner.os }}-cargo-
+      - name: Cache Dependencies (ubuntu only)
+        if: matrix.config.os == 'ubuntu-22.04'
+        id: cache-ubuntu-deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/lib/x86_64-linux-gnu
+            /usr/include/x86_64-linux-gnu
+            /usr/bin/g++-mingw-w64-x86-64
+            /usr/bin/nsis
+            /usr/bin/cmake
+            /usr/bin/clang
+            /usr/lib/libsoup2.4.so
+            /usr/lib/lsb
+            /usr/lib/libwebkit2gtk-4.0.so
+            /usr/lib/libgtk-3.so
+            /usr/lib/libayatana-appindicator3.so
+            /usr/lib/librsvg2.so
+          key: ${{ runner.os }}-deps
+      # - name: Install Tauri CLI
+      #   run: |
+      #     cd src-tauri/
+      #     cargo install tauri-cli --version 1.6.2
+      #     cargo tauri -V
+      # - name: build infinity-key-${{ env.BETREIBER }}
+      #   env:
+      #     BETREIBER: staging
+      #     BETREIBER_ARTIFACT: infinity-key
+      #   shell: bash
+      #   run: |
+      #     echo ${{ env.BETREIBER }}
+      #     ls -la
+      #     cd src-tauri/betreiber/${{ env.BETREIBER }}
+      #     cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
+      #     cd ../../ # zurück zu src-tauri
+      #     mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
+      #     tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+      #     rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
   # upload-assets:
   #   needs:
   #     - "create-assets"
