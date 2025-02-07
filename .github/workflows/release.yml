@@ -28,6 +28,19 @@ jobs:
           sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
           sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
           sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+      - name: Download Maven Artifact
+        id: download-maven-artifact
+        uses: clausnz/github-action-download-maven-artifact@0.0.4
+        with:
+          url: "https://artifacts.ehex.de/repository/"
+          repository: "hsk-artifacts"
+          groupId: "de.ehex.hsk.hsk-admin.gui"
+          artifactId: "infinity-key-frontend"
+          # see https://code.ehex.cloud/hsk-admin/ik-gui/releases
+          version: "0.42.0"
+          extension: "jar"
+          username: ${{ secrets.ARTIFACTS_EHEX_DE_USERNAME }}
+          password: ${{ secrets.ARTIFACTS_EHEX_DE_PASSWORD }}
       - name: Install Tauri CLI
         run: |
           cd src-tauri/
