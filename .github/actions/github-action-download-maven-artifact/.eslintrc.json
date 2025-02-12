@@ -1,0 +1,19 @@
+{
+  "parser": "babel-eslint",
+  "extends": "standard",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "node": true
+  },
+  "plugins": [
+    "standard",
+    "promise"
+  ],
+  "rules": {
+    "indent": ["error", 4, { "SwitchCase": 1 }]
+  }
+}

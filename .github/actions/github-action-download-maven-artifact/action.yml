@@ -1,0 +1,52 @@
+name: "Maven Artifact Download"
+description: "Download Artifacts from a Maven Repository - GitHub Action"
+inputs:
+
+  url:
+    description: The Maven repository URL
+    required: true
+
+  repository:
+    description: The repository name
+    required: true
+
+  groupId:
+    description: The Maven groupId
+    required: true
+
+  artifactId:
+    description: The Maven artifactId
+    required: true
+
+  version:
+    description: The artifact version
+    required: true
+
+  classifier:
+    description: The Maven classifier
+    required: false
+
+  extension:
+    description: The file extension of the download file
+    required: true
+
+  username:
+    description: The username for the Maven repository access, used for basic auth
+    required: false
+
+  password:
+    description: The password for the Maven repository access, used for basic auth
+    required: false
+
+outputs:
+
+  file:
+    description: The path to the downloaded file from the repository, which can be used in other actions
+
+runs:
+  using: node12
+  main: dist/index.js
+
+branding:
+  icon: package
+  color: blue

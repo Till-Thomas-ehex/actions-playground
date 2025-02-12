@@ -1,0 +1,53 @@
+{
+  "name": "github-action-download-maven-artifact",
+  "version": "1.0.0",
+  "description": "Download Artifacts from a Maven repository",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clausnz/github-action-download-maven-artifact"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "babel": "rm -rf babel && babel src -d babel",
+    "ncc": "rm -rf dist && ncc build babel/index.js -mo dist",
+    "clean": "rm -rf babel",
+    "lint": "eslint --fix src/**/*.js",
+    "build": "npm run babel && npm run lint && npm run ncc && npm run clean",
+    "prepare-dev": "rm babel/index.js && mv babel/dev.js babel/index.js",
+    "dev": "npm run babel && npm run prepare-dev && npm run ncc && npm run clean && node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "@babel/plugin-transform-runtime": "^7.12.1",
+    "@babel/runtime": "^7.12.5",
+    "base-64": "^1.0.0",
+    "fs": "0.0.1-security",
+    "graphql": "^15.4.0",
+    "http": "0.0.1-security",
+    "https": "^1.0.0",
+    "mvn-artifact-download": "^5.1.0",
+    "mvn-dl": "^5.1.0",
+    "node-fetch": "^2.6.1",
+    "path": "^0.12.7",
+    "regenerator-runtime": "^0.13.7",
+    "uuid": "^8.3.1",
+    "yaml": "^1.10.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.7",
+    "@babel/core": "^7.12.7",
+    "@babel/preset-env": "^7.12.1",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.13.0",
+    "eslint-config-standard": "^16.0.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.1.0"
+  }
+}
