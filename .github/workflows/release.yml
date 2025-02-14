@@ -29,16 +29,23 @@ jobs:
           sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
           sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
           sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-      - name: Download Maven Artifact  EXAMPLE
-        id: download-maven-artifact
-        uses: ./.github/actions/github-action-download-maven-artifact
+      - name: setup toolchain
+        uses: actions-rs/toolchain@v1.0.6
         with:
-          url: "https://repo1.maven.org"
-          repository: "maven2"
-          groupId: "javax.mail"
-          artifactId: "mail"
-          version: "1.5.0-b01"
-          extension: "jar"
+          profile: minimal
+          toolchain: stable-${{ matrix.config.target }}
+          default: true
+          override: true
+      # - name: Download Maven Artifact  EXAMPLE
+      #   id: download-maven-artifact
+      #   uses: ./.github/actions/github-action-download-maven-artifact
+      #   with:
+      #     url: "https://repo1.maven.org"
+      #     repository: "maven2"
+      #     groupId: "javax.mail"
+      #     artifactId: "mail"
+      #     version: "1.5.0-b01"
+      #     extension: "jar"
       # - name: install openssl
       #   if: matrix.config.os == 'macos-latest'
       #   run: |
