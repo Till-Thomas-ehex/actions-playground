@@ -34,6 +34,7 @@ jobs:
         with:
           toolchain: stable
           target: ${{matrix.config.target}}
+          cache-workspaces: ./src-tauri/
       # - name: Download Maven Artifact  EXAMPLE
       #   id: download-maven-artifact
       #   uses: ./.github/actions/github-action-download-maven-artifact
