@@ -14,23 +14,23 @@ jobs:
       fail-fast: false
       matrix:
         # Only include Linux targets, adding an AppImage build
-        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
+        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
         # MACOS config: ${{fromJson('[{"build":"macos-x86_64","name":"macos-universal","os":"macos-latest","target":"universal-apple-darwin","package":"app","extension":"app","artifact_path":"target/universal-apple-darwin/release/bundle/macos"}]')}}
     steps:
       - uses: actions/checkout@master
         with:
           lfs: true
           fetch-depth: 0
-      - name: install dependencies (ubuntu only)
-        if: matrix.config.os == 'ubuntu-22.04' && steps.cache-ubuntu-deps.outputs.cache-hit != 'true'
-        run: |
-          ls -al
-          sudo apt-get update
-          sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
-          sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
-          sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+      # - name: install dependencies (ubuntu only)
+      #   if: matrix.config.os == 'ubuntu-22.04' && steps.cache-ubuntu-deps.outputs.cache-hit != 'true'
+      #   run: |
+      #     ls -al
+      #     sudo apt-get update
+      #     sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
+      #     sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
+      #     sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
       - name: setup toolchain
-        uses: dtolnay/rust-toolchain@master
+        uses: actions-rust-lang/setup-rust-toolchain@v1.10.1
         with:
           toolchain: stable
           target: ${{matrix.config.target}}
