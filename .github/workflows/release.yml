@@ -35,6 +35,14 @@ jobs:
           toolchain: stable
           target: ${{matrix.config.target}}
           cache-workspaces: ./src-tauri/
+      - name: List Installed Rust Toolchains and Targets
+        shell: bash
+        run: |
+          echo "Installed Rust toolchains:"
+          rustup show
+          echo ""
+          echo "Installed targets:"
+          rustup show active-toolchain --verbose
       # - name: Download Maven Artifact  EXAMPLE
       #   id: download-maven-artifact
       #   uses: ./.github/actions/github-action-download-maven-artifact
