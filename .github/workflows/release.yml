@@ -1,7 +1,10 @@
 name: infinity key release
 # never use `Build Infinity-key Release Artifacts` again as name because of build hickups
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
 env:
   CARGO_TERM_QUIET: true
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,25 +68,26 @@ jobs:
       #     echo "OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
       #     echo "OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib" >> $GITHUB_ENV
       #     echo "OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include" >> $GITHUB_ENV
-      # - name: Install Tauri CLI
-      #   run: |
-      #     cd src-tauri/
-      #     cargo install tauri-cli --version 1.6.2
-      #     cargo tauri -V
-      # - name: build infinity-key-${{ env.BETREIBER }}
-      #   env:
-      #     BETREIBER: staging
-      #     BETREIBER_ARTIFACT: infinity-key
-      #   shell: bash
-      #   run: |
-      #     echo ${{ env.BETREIBER }}
-      #     ls -la
-      #     cd src-tauri/betreiber/${{ env.BETREIBER }}
-      #     cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
-      #     cd ../../ # zurück zu src-tauri
-      #     mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
-      #     tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
-      #     rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+      - name: Install Tauri CLI
+        run: |
+          cd src-tauri/
+          cargo install tauri-cli --version 1.6.2
+          cargo tauri -V
+      - name: build infinity-key-${{ env.BETREIBER }}
+        if: github.event.release.prerelease == false
+        env:
+          BETREIBER: staging
+          BETREIBER_ARTIFACT: infinity-key
+        shell: bash
+        run: |
+          echo ${{ env.BETREIBER }}
+          ls -la
+          cd src-tauri/betreiber/${{ env.BETREIBER }}
+          cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
+          cd ../../ # zurück zu src-tauri
+          mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
+          tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
+          rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
   # upload-assets:
   #   needs:
   #     - "create-assets"
