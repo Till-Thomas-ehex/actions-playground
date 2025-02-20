@@ -11,6 +11,6 @@ env:
 
 jobs:
   call-reusable-workflow:
-    uses: ./download-build-assets.yml@main
+    uses: ./.github/workflows/download-build-assets.yml@main
     with:
       secrets: inherit
