@@ -3,11 +3,7 @@ name: Download and Prepare Build Assets
 on:
   workflow_call:
     secrets:
-      ARTIFACTS_USERNAME:
-        required: true
-      ARTIFACTS_PASSWORD:
-        required: true
-      INFINITY_KEY_LIB_PRIVATE_KEY:
+      GITHUB_TOKEN:
         required: true
 
 jobs:
