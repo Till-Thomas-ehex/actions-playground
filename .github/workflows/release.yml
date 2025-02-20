@@ -12,5 +12,9 @@ env:
 jobs:
   call-reusable-workflow:
     uses: ./.github/workflows/download-build-assets.yml
-    with:
-      secrets: inherit
+    secrets:
+      CUSTOM_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # with:
+    #   secrets:
+    #     CUSTOM_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

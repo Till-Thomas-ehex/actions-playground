@@ -2,6 +2,9 @@ name: Download and Prepare Build Assets
 
 on:
   workflow_call:
+    secrets:
+      CUSTOM_GITHUB_TOKEN:
+        required: true
 
 jobs:
   download-build-assets:
@@ -22,4 +25,4 @@ jobs:
         run: npm ci
 
       - name: Install dependencies
-        run: echo ${{ secrets.GITHUB_TOKEN }}
+        run: echo ${{ secrets.CUSTOM_GITHUB_TOKEN }}
