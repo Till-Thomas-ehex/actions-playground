@@ -1,0 +1,32 @@
+name: Download and Prepare Build Assets
+
+on:
+  workflow_call:
+    secrets:
+      ARTIFACTS_USERNAME:
+        required: true
+      ARTIFACTS_PASSWORD:
+        required: true
+      INFINITY_KEY_LIB_PRIVATE_KEY:
+        required: true
+
+jobs:
+  download-build-assets:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: disable git eol translation
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@master
+        with:
+          lfs: true
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install dependencies
+        run: echo ${{ secrets.GITHUB_TOKEN }}

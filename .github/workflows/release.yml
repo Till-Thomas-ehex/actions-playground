@@ -8,124 +8,15 @@ on:
 env:
   CARGO_TERM_QUIET: true
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+  APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+  APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
 jobs:
-  create-assets:
-    name: Create ${{ matrix.config.name }}
-    runs-on: ${{ matrix.config.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # Only include Linux targets, adding an AppImage build
-        config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu, armv7-unknown-linux-gnueabihf","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
-        # MACOS config: ${{fromJson('[{"build":"macos-x86_64","name":"macos-universal","os":"macos-latest","target":"universal-apple-darwin","package":"app","extension":"app","artifact_path":"target/universal-apple-darwin/release/bundle/macos"}]')}}
-    steps:
-      - uses: actions/checkout@master
-        with:
-          lfs: true
-          fetch-depth: 0
-      # - name: install dependencies (ubuntu only)
-      #   if: matrix.config.os == 'ubuntu-22.04' && steps.cache-ubuntu-deps.outputs.cache-hit != 'true'
-      #   run: |
-      #     ls -al
-      #     sudo apt-get update
-      #     sudo apt-get install -y g++-mingw-w64-x86-64 nsis cmake clang libsoup2.4-dev lsb-release
-      #     sudo apt-get install -y libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev
-      #     sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-      - name: setup toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1.10.1
-        with:
-          toolchain: stable
-          target: ${{matrix.config.target}}
-          cache-workspaces: ./src-tauri/
-      - name: List Installed Rust Toolchains and Targets
-        shell: bash
-        run: |
-          echo "Installed Rust toolchains:"
-          rustup show
-          echo ""
-          echo "Installed targets:"
-          rustup show active-toolchain --verbose
-      # - name: Download Maven Artifact  EXAMPLE
-      #   id: download-maven-artifact
-      #   uses: ./.github/actions/github-action-download-maven-artifact
-      #   with:
-      #     url: "https://repo1.maven.org"
-      #     repository: "maven2"
-      #     groupId: "javax.mail"
-      #     artifactId: "mail"
-      #     version: "1.5.0-b01"
-      #     extension: "jar"
-      # - name: install openssl
-      #   if: matrix.config.os == 'macos-latest'
-      #   run: |
-      #     if brew list openssl &>/dev/null; then
-      #       echo "Using existing OpenSSL installation."
-      #     else
-      #       echo "OpenSSL not found. Installing..."
-      #       brew install openssl
-      #     fi
-      #     echo "OPENSSL_DIR=$(brew --prefix openssl)" >> $GITHUB_ENV
-      #     echo "OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib" >> $GITHUB_ENV
-      #     echo "OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include" >> $GITHUB_ENV
-      - name: Install Tauri CLI
-        run: |
-          cd src-tauri/
-          cargo install tauri-cli --version 1.6.2
-          cargo tauri -V
-      - name: build infinity-key-${{ env.BETREIBER }}
-        if: github.event.release.prerelease == false
-        env:
-          BETREIBER: staging
-          BETREIBER_ARTIFACT: infinity-key
-        shell: bash
-        run: |
-          echo ${{ env.BETREIBER }}
-          ls -la
-          cd src-tauri/betreiber/${{ env.BETREIBER }}
-          cargo tauri build --verbose --bundles ${{ matrix.config.package }} --target ${{ matrix.config.target }}
-          cd ../../ # zurück zu src-tauri
-          mv ${{ matrix.config.artifact_path }}/${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }} .
-          tar -cvzf "${{ env.BETREIBER }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz" ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
-          rm -r ${{env.BETREIBER_ARTIFACT }}*.${{ matrix.config.extension }}
-  # upload-assets:
-  #   needs:
-  #     - "create-assets"
-  #   runs-on: ubuntu-22.04
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       config: ${{ fromJson('[{"build":"linux-x86_64","name":"linux-x86_64-deb","os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu","package":"deb","extension":"deb","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/deb"},{"package":"appimage","extension":"AppImage","artifact_path":"target/x86_64-unknown-linux-gnu/release/bundle/appimage"}]') }}
-  #       betreiber: ${{ fromJson('[{"name":"blanko","artifact":"infinity-key"}] ') }}
-  #   steps:
-  #     - name: Download all stored artefacts
-  #       uses: actions/download-artifact@v4
-  #     - name: Nexus Repo Publish Desktop
-  #       uses: sonatype-nexus-community/nexus-repo-github-action@master
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       with:
-  #         serverUrl: https://artifacts.ehex.de/
-  #         username: ${{ secrets.ARTIFACTS_EHEX_DE_USERNAME }}
-  #         password: ${{ secrets.ARTIFACTS_EHEX_DE_PASSWORD }}
-  #         format: maven2
-  #         repository: hsk-artifacts
-  #         coordinates: groupId=de.ehex.hsk.hsk-admin.key.infinity-key-bundle artifactId=infinity-key-${{ matrix.betreiber.name }}-${{ matrix.config.name }} version=${{ github.ref_name }}
-  #         assets: extension=tar.gz
-  #         filename: "infinity-key-${{ matrix.config.name }}/${{ matrix.betreiber.name }}-${{ matrix.config.target }}-${{ matrix.config.package }}.tar.gz"
-  #     - name: Download Web Release Asset
-  #       uses: actions/download-artifact@v4
-  #       if: ${{ false && matrix.betreiber.name == 'blanko' && matrix.config.package == 'nsis' && startsWith(github.ref, 'refs/tags/') }}
-  #       with:
-  #         name: infinity-key-web-windows
-  #     - name: Nexus Repo Publish Web
-  #       uses: sonatype-nexus-community/nexus-repo-github-action@master
-  #       if: ${{ false && matrix.betreiber.name == 'blanko' && matrix.config.package == 'nsis' && startsWith(github.ref, 'refs/tags/') }}
-  #       with:
-  #         serverUrl: https://artifacts.ehex.de/
-  #         username: ${{ secrets.ARTIFACTS_EHEX_DE_USERNAME }}
-  #         password: ${{ secrets.ARTIFACTS_EHEX_DE_PASSWORD }}
-  #         format: maven2
-  #         repository: hsk-artifacts
-  #         coordinates: groupId=de.ehex.hsk.hsk-admin.key.infinity-key-web-static-dist artifactId=infinity-key-${{ matrix.betreiber.name }}-${{ matrix.config.name }} version=${{ github.ref_name }}
-  #         assets: extension=zip
-  #         filename: web.zip
+  call-reusable-workflow:
+    uses: ./download-build-assets.yml
+    with:
+      secrets: inherit
