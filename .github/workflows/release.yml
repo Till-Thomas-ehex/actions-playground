@@ -14,7 +14,3 @@ jobs:
     uses: ./.github/workflows/download-build-assets.yml
     secrets:
       CUSTOM_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # with:
-    #   secrets:
-    #     CUSTOM_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
