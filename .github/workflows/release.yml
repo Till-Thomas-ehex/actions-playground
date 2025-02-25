@@ -8,9 +8,113 @@ on:
 env:
   CARGO_TERM_QUIET: true
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  INFINITY_KEY_LIB_VERSION: "1.1.1"
 
 jobs:
-  call-reusable-workflow:
-    uses: ./.github/workflows/download-build-assets.yml
-    secrets:
-      CUSTOM_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  create-assets:
+    name: Create ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # workaround to not start expensive Mac and Windows nodes, but duplicates linux config
+        config:
+          - build: linux-x86_64
+            name: linux-x86_64-deb
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            package: deb
+            extension: deb
+            artifact_path: target/x86_64-unknown-linux-gnu/release/bundle/deb
+
+          - build: macos-x86_64
+            name: macos-universal
+            os: macos-latest
+            target: universal-apple-darwin
+            package: app
+            extension: app
+            artifact_path: target/universal-apple-darwin/release/bundle/macos
+
+          - build: windows-x86_64-msvc
+            name: windows-x86_64-msvc-nsis
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            package: nsis
+            extension: exe
+            artifact_path: target/x86_64-pc-windows-msvc/release/bundle/nsis
+    steps:
+      - name: Cache Cargo target
+        uses: actions/cache@v4
+        with:
+          path: |
+            src-tauri/target
+          key: t-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            t-${{ runner.os }}-cargo-
+              - name: Cache Rust Toolchain (ubuntu)
+              id: cache-cargo-toolchain-ubuntu
+              if: startsWith(matrix.config.os, 'ubuntu')
+              uses: actions/cache@v3
+              with:
+                path: |
+                  ~/.rustup
+                  ~/.cargo/bin
+                key: rustup-${{ matrix.config.os }}
+                restore-keys: |
+                  rustup-${{ matrix.config.os }}
+      - name: Cache Rust Toolchain (macos)
+        id: cache-cargo-toolchain-macos
+        if: startsWith(matrix.config.os, 'macos')
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo/bin
+          key: rustup-${{ matrix.config.os }}
+          restore-keys: |
+            rustup-${{ matrix.config.os }}
+      - name: Cache Rust Toolchain (Windows)
+        id: cache-cargo-toolchain-windows
+        if: startsWith(matrix.config.os, 'windows')
+        uses: actions/cache@v3
+        with:
+          path: |
+            C:\Users\runneradmin\.rustup
+            C:\Users\runneradmin\.cargo\bin
+          key: rustup-windows
+          restore-keys: |
+            rustup-windows
+
+      - name: setup toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1.10.1
+        with:
+          toolchain: stable
+          target: ${{ matrix.config.os != 'macos-latest' && matrix.config.target || 'aarch64-apple-darwin, x86_64-apple-darwin' }}
+          cache-workspaces: ./src-tauri/
+
+      - name: Install Tauri CLI
+        if: >-
+          (steps.cache-cargo-toolchain-ubuntu.outputs.cache-hit != 'true' && startsWith(matrix.config.os, 'ubuntu')) ||
+          (steps.cache-cargo-toolchain-macos.outputs.cache-hit != 'true' && startsWith(matrix.config.os, 'macos')) ||
+          (steps.cache-cargo-toolchain-windows.outputs.cache-hit != 'true' && startsWith(matrix.config.os, 'windows'))
+        run: |
+          echo "cache hit ${{ matrix.config.os }}"
+          cd src-tauri/
+          cargo install tauri-cli --version 1.6.2
+          cargo tauri -V
+
+      - name: build Web # also do this here to use cache, linux web should be build in Jenkins
+        if: github.event.release.prerelease == false && !startsWith(matrix.config.package , 'appimage')
+        run: |
+          cd src-tauri
+          cargo build --no-default-features --features plain-server,static-dist --release --target ${{ matrix.config.target }} --bin=infinity-key-blanko --package=infinity-key-blanko
+          7z a web.zip target/${{ matrix.config.target }}/release/infinity-key-blanko.exe
+      - name: Upload Web Release Asset
+        uses: actions/upload-artifact@v4
+        if: matrix.config.package == 'nsis' && github.event.release.prerelease == false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: infinity-key-web-windows
+          path: src-tauri/web.zip
+          retention-days: 1
