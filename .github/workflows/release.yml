@@ -43,6 +43,10 @@ jobs:
             extension: exe
             artifact_path: target/x86_64-pc-windows-msvc/release/bundle/nsis
     steps:
+      - uses: actions/checkout@master
+        with:
+          lfs: true
+          fetch-depth: 0
       - name: Cache Cargo target
         uses: actions/cache@v4
         with:
@@ -99,7 +103,7 @@ jobs:
           (steps.cache-cargo-toolchain-windows.outputs.cache-hit != 'true' && startsWith(matrix.config.os, 'windows'))
         run: |
           echo "cache hit ${{ matrix.config.os }}"
-          cd ./src-tauri/
+          cd src-tauri/
           cargo install tauri-cli --version 1.6.2
           cargo tauri -V
 
