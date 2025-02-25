@@ -51,17 +51,17 @@ jobs:
           key: t-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             t-${{ runner.os }}-cargo-
-              - name: Cache Rust Toolchain (ubuntu)
-              id: cache-cargo-toolchain-ubuntu
-              if: startsWith(matrix.config.os, 'ubuntu')
-              uses: actions/cache@v3
-              with:
-                path: |
-                  ~/.rustup
-                  ~/.cargo/bin
-                key: rustup-${{ matrix.config.os }}
-                restore-keys: |
-                  rustup-${{ matrix.config.os }}
+      - name: Cache Rust Toolchain (ubuntu)
+        id: cache-cargo-toolchain-ubuntu
+        if: startsWith(matrix.config.os, 'ubuntu')
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo/bin
+          key: rustup-${{ matrix.config.os }}
+          restore-keys: |
+            rustup-${{ matrix.config.os }}
       - name: Cache Rust Toolchain (macos)
         id: cache-cargo-toolchain-macos
         if: startsWith(matrix.config.os, 'macos')
