@@ -99,7 +99,7 @@ jobs:
           (steps.cache-cargo-toolchain-windows.outputs.cache-hit != 'true' && startsWith(matrix.config.os, 'windows'))
         run: |
           echo "cache hit ${{ matrix.config.os }}"
-          cd src-tauri/
+          cd ./src-tauri/
           cargo install tauri-cli --version 1.6.2
           cargo tauri -V
 
