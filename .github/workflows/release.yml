@@ -107,6 +107,12 @@ jobs:
           cargo install tauri-cli --version 1.6.2
           cargo tauri -V
 
+      - name: test tauri build
+        if: github.event.release.prerelease == false && !startsWith(matrix.config.package , 'appimage')
+        run: |
+          cd src-tauri
+          cargo tauri build
+
       # - name: build Web # also do this here to use cache, linux web should be build in Jenkins
       #   if: github.event.release.prerelease == false && !startsWith(matrix.config.package , 'appimage')
       #   run: |
