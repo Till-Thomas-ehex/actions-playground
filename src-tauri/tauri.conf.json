@@ -2,11 +2,11 @@
   "build": {
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "devPath": "4500",
-    "distDir": "../../../../dist/infinity-key"
+    "devPath": "http://localhost:4201",
+    "distDir": "../dist"
   },
   "package": {
-    "productName": "staging-test",
+    "productName": "actions-playground",
     "version": "0.1.0"
   },
   "tauri": {
@@ -28,7 +28,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.some.test.stuff",
+      "identifier": "com.test.testikal",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -57,7 +57,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "staging-test",
+        "title": "actions-playground",
         "width": 800
       }
     ]
