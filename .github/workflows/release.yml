@@ -107,18 +107,18 @@ jobs:
           cargo install tauri-cli --version 1.6.2
           cargo tauri -V
 
-      - name: build Web # also do this here to use cache, linux web should be build in Jenkins
-        if: github.event.release.prerelease == false && !startsWith(matrix.config.package , 'appimage')
-        run: |
-          cd src-tauri
-          cargo build --no-default-features --features plain-server,static-dist --release --target ${{ matrix.config.target }} --bin=infinity-key-blanko --package=infinity-key-blanko
-          7z a web.zip target/${{ matrix.config.target }}/release/infinity-key-blanko.exe
-      - name: Upload Web Release Asset
-        uses: actions/upload-artifact@v4
-        if: matrix.config.package == 'nsis' && github.event.release.prerelease == false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          name: infinity-key-web-windows
-          path: src-tauri/web.zip
-          retention-days: 1
+      # - name: build Web # also do this here to use cache, linux web should be build in Jenkins
+      #   if: github.event.release.prerelease == false && !startsWith(matrix.config.package , 'appimage')
+      #   run: |
+      #     cd src-tauri
+      #     cargo build --no-default-features --features plain-server,static-dist --release --target ${{ matrix.config.target }} --bin=infinity-key-blanko --package=infinity-key-blanko
+      #     7z a web.zip target/${{ matrix.config.target }}/release/infinity-key-blanko.exe
+      # - name: Upload Web Release Asset
+      #   uses: actions/upload-artifact@v4
+      #   if: matrix.config.package == 'nsis' && github.event.release.prerelease == false
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     name: infinity-key-web-windows
+      #     path: src-tauri/web.zip
+      #     retention-days: 1
